@@ -1,7 +1,9 @@
+/// Generates CRC-64-NVME (aka `CRC-64-Rocksoft`) checksums, using SIMD-accelerated
+/// carryless-multiplication, from a file on disk.
+
 use std::env;
 use crc64fast::Digest;
 
-// Generates CRC-64-NVME (aka `CRC-64-Rocksoft`) Checksums, using SIMD, from a file on disk
 fn main() {
     let args: Vec<String> = env::args().collect();
 
