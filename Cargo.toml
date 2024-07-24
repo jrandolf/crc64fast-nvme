@@ -29,3 +29,6 @@ fake-simd = []
 [[bench]]
 name = 'benchmark'
 harness = false
+
+[profile.release]
+strip = true
