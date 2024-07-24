@@ -2,7 +2,7 @@
 
 use std::env::args;
 
-const POLY: u64 = 0x42F0E1EBA9EA3693;
+const POLY: u64 = 0xAD93D23594C93659;
 
 // usage:
 //

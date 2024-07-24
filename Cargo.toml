@@ -7,7 +7,6 @@ edition = "2021"
 keywords = ["crc", "crc64", "simd", "checksum"]
 repository = "https://github.com/tikv/crc64fast"
 description = "SIMD accelerated CRC64 calculation"
-exclude = ["build_table.rs"]
 readme = "README.md"
 
 # Note: Rust 1.70 upgraded LLVM version to 16 (in particular https://reviews.llvm.org/D131047)

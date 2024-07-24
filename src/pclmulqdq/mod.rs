@@ -1,11 +1,11 @@
 // Copyright 2019 TiKV Project Authors. Licensed under MIT or Apache-2.0.
 
-//! PCLMULQDQ-based CRC-64-ECMA computer.
+//! PCLMULQDQ-based CRC-64-NVME computer.
 //!
 //! The implementation is based on Intel's "Fast CRC Computation for Generic
 //! Polynomials Using PCLMULQDQ Instruction" [white paper].
 //!
-//! [white paper]: https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf
+//! [white paper]: https://web.archive.org/web/20131224125630/https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf
 
 #[cfg(not(feature = "fake-simd"))]
 #[cfg_attr(any(target_arch = "x86", target_arch = "x86_64"), path = "x86.rs")]

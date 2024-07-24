@@ -3,7 +3,7 @@
 //! `crc64fast`
 //! ===========
 //!
-//! SIMD-accelerated CRC-64-ECMA computation
+//! SIMD-accelerated CRC-64-NVME (aka CRC-64-Rocksoft) computation
 //! (similar to [`crc32fast`](https://crates.io/crates/crc32fast)).
 //!
 //! ## Usage
@@ -15,7 +15,7 @@
 //! c.write(b"hello ");
 //! c.write(b"world!");
 //! let checksum = c.sum64();
-//! assert_eq!(checksum, 0x8483_c0fa_3260_7d61);
+//! assert_eq!(checksum, 0xd9160d1fa8e418e3);
 //! ```
 
 mod pclmulqdq;
@@ -55,7 +55,7 @@ impl Digest {
         self.state = (self.computer)(self.state, bytes);
     }
 
-    /// Computes the current CRC-64-ECMA value.
+    /// Computes the current CRC-64-NVME value.
     pub fn sum64(&self) -> u64 {
         !self.state
     }
@@ -70,26 +70,45 @@ impl Default for Digest {
 #[cfg(test)]
 mod tests {
     use super::Digest;
-    use crc::{Crc, CRC_64_XZ};
     use proptest::collection::size_range;
     use proptest::prelude::*;
 
-    const CRC: Crc<u64> = Crc::<u64>::new(&CRC_64_XZ);
+    // CRC-64/NVME (aka CRC-64/Rocksoft)
+    // https://github.com/torvalds/linux/blob/master/lib/crc64.c#L73
+    const CRC_NVME: crc::Algorithm<u64> = crc::Algorithm {
+        width: 64,
+        poly: 0xAD93D23594C93659,
+        init: 0xFFFFFFFFFFFFFFFF,
+        refin: true,
+        refout: true,
+        xorout: 0xFFFFFFFFFFFFFFFF,
+        check: 0xae8b14860a799888,
+        residue: 0x0000000000000000
+    };
 
     #[test]
     fn test_standard_vectors() {
         static CASES: &[(&[u8], u64)] = &[
+            // from the Linux kernel
+            // https://github.com/torvalds/linux/blob/master/crypto/testmgr.h#L5358
+            (&[0; 4096], 0x6482d367eb22b64e),
+            (&[255; 4096], 0xc0ddba7302eca3ac),
+
+            // from our own internal tests
+            (b"123456789", 0xae8b14860a799888),
+
+            // updated values from the original CRC-64/XZ fork of this project
             (b"", 0),
-            (b"@", 0x7b1b_8ab9_8fa4_b8f8),
-            (b"1\x97", 0xfeb8_f7a1_ae3b_9bd4),
-            (b"M\"\xdf", 0xc016_0ce8_dd46_74d3),
-            (b"l\xcd\x13\xd7", 0x5c60_a6af_8299_6ea8),
+            (b"@", 0x2808afa9582aa47),
+            (b"1\x97", 0xb4af0ae0feb08e0f),
+            (b"M\"\xdf", 0x85d7cd041a2a8a5d),
+            (b"l\xcd\x13\xd7", 0x1860820ea79b0fa3),
 
-            (&[0; 32], 0xc95a_f861_7cd5_330c),
-            (&[255; 32], 0xe95d_ce9e_faa0_9acf),
-            (b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F", 0x7fe5_71a5_8708_4d10),
+            (&[0; 32], 0xcf3473434d4ecf3b),
+            (&[255; 32], 0xa0a06974c34d63c4),
+            (b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F", 0xb9d9d4a8492cbd7f),
 
-            (&[0; 1024], 0xc378_6397_2069_270c),
+            (&[0; 1024], 0x691bb2b09be5498a),
         ];
 
         for (input, result) in CASES {
@@ -117,7 +136,13 @@ mod tests {
         fn equivalent_to_crc(bytes in any_buffer()) {
             let mut hasher = Digest::new();
             hasher.write(&bytes);
-            prop_assert_eq!(hasher.sum64(), CRC.checksum(&bytes));
+
+            // CRC-64/NVME
+            let crc = crc::Crc::<u64>::new(&CRC_NVME);
+            let mut digest = crc.digest();
+            digest.update(&bytes);
+
+            prop_assert_eq!(hasher.sum64(), digest.finalize());
         }
 
         #[test]
