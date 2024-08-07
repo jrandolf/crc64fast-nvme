@@ -1,14 +1,10 @@
-crc64fast
+crc64fast (NVME)
 =========
-
-[![Build status](https://github.com/tikv/crc64fast/workflows/Rust/badge.svg)](https://github.com/tikv/crc64fast/actions?query=workflow%3ARust)
-[![Latest Version](https://img.shields.io/crates/v/crc64fast.svg)](https://crates.io/crates/crc64fast)
-[![Documentation](https://img.shields.io/badge/api-rustdoc-blue.svg)](https://docs.rs/crc64fast)
 
 SIMD-accelerated carryless-multiplication [CRC-64/NVME](https://github.com/torvalds/linux/blob/786c8248dbd33a5a7a07f7c6e55a7bfc68d2ca48/lib/crc64.c#L66-L73) (a.k.a. `CRC-64/Rocksoft`) checksum computation
 (similar to [crc32fast](https://crates.io/crates/crc32fast) and forked from [crc64fast](https://github.com/tikv/crc64fast) which calculates [CRC-64/XZ](https://reveng.sourceforge.io/crc-catalogue/all.htm#crc.cat.crc-64-xz)).
 
-Primarily changes the `CRC-64/XZ` (aka `CRC-64/GO-ECMA`) polynomial from `crc64fast` (which uses the `ECMA-182` polynomial [`0x42F0E1EBA9EA3693`]) to use the `NVME` / `Rocksoft` polynomial (`0xAD93D23594C93659`), plus re-calculates the input parameters (tables, keys, mu, and reciprocal polynomial) for carryless-multiplication.
+Primarily changes the `CRC-64/XZ` (aka `CRC-64/GO-ECMA`) polynomial from [crc64fast](https://github.com/tikv/crc64fast) (which uses the `ECMA-182` polynomial [`0x42F0E1EBA9EA3693`]) to use the `NVME` / `Rocksoft` polynomial (`0xAD93D23594C93659`), plus re-calculates the input parameters (tables, keys, mu, and reciprocal polynomial) for carryless-multiplication.
 
 Based on the Intel [Fast CRC Computation for Generic Polynomials Using PCLMULQDQ Instruction](https://web.archive.org/web/20131224125630/https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf) paper.
 
