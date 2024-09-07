@@ -88,7 +88,7 @@ mod tests {
         refout: true,
         xorout: 0xFFFFFFFFFFFFFFFF,
         check: 0xae8b14860a799888,
-        residue: 0x0000000000000000
+        residue: 0x0000000000000000,
     };
 
     #[test]

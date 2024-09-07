@@ -15,29 +15,13 @@
 /// Linux's implementations: https://github.com/torvalds/linux/blob/786c8248dbd33a5a7a07f7c6e55a7bfc68d2ca48/lib/crc64.c
 ///
 /// Intel white paper: https://web.archive.org/web/20131224125630/https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf
-
 extern crate core;
 
 use std::env;
 
-// the key sizes to calculate, given this is a CRC-64 (rather than a CRC-32, as in the Intel paper)
+/// the key sizes to calculate, given this is a CRC-64 (rather than a CRC-32, as in the Intel paper)
 static KEY_SIZES: [u32; 16] = [
-    128,
-    192,
-    256,
-    320,
-    384,
-    448,
-    512,
-    576,
-    640,
-    704,
-    768,
-    832,
-    896,
-    960,
-    1024,
-    1088,
+    128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 1088,
 ];
 
 /// Reverses the bits of a 64-bit unsigned integer.
@@ -250,16 +234,18 @@ fn main() {
         return;
     }
 
-    let polynomial = u64::from_str_radix(
-        args[1].trim_start_matches("0x"), 16
-    ).expect("Failed to parse polynomial");
+    let polynomial = u64::from_str_radix(args[1].trim_start_matches("0x"), 16)
+        .expect("Failed to parse polynomial");
 
     for &size in KEY_SIZES.iter() {
         println!("k_{} = 0x{:x}", size, generate_key(size as u64, polynomial));
     }
 
     println!("mu = 0x{:x}", generate_mu(polynomial));
-    println!("reciprocal = 0x{:x}", generate_reciprocal_polynomial(polynomial));
+    println!(
+        "reciprocal = 0x{:x}",
+        generate_reciprocal_polynomial(polynomial)
+    );
 }
 
 #[cfg(test)]

@@ -1,10 +1,9 @@
+use crc64fast_nvme::Digest;
 /// Generates CRC-64/NVME checksums, using SIMD-accelerated
 /// carryless-multiplication, from a file on disk.
-
 use std::env;
 use std::fs;
 use std::process::ExitCode;
-use crc64fast_nvme::Digest;
 
 const CRC_NVME: crc::Algorithm<u64> = crc::Algorithm {
     width: 64,
@@ -14,7 +13,7 @@ const CRC_NVME: crc::Algorithm<u64> = crc::Algorithm {
     refout: true,
     xorout: 0xFFFFFFFFFFFFFFFF,
     check: 0xae8b14860a799888,
-    residue: 0x0000000000000000
+    residue: 0x0000000000000000,
 };
 
 fn calculate_crc_64_simd_from_file(file: &str) -> u64 {
