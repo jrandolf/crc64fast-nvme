@@ -1,6 +1,6 @@
 // Copyright 2019 TiKV Project Authors. Licensed under MIT or Apache-2.0.
 
-//! `crc64fast`
+//! `crc64fast-nvme`
 //! ===========
 //!
 //! SIMD-accelerated CRC-64/NVME computation
@@ -9,7 +9,7 @@
 //! ## Usage
 //!
 //! ```
-//! use crc64fast::Digest;
+//! use crc64fast_nvme::Digest;
 //!
 //! let mut c = Digest::new();
 //! c.write(b"hello ");

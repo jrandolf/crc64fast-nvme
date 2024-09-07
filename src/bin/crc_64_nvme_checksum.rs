@@ -4,7 +4,7 @@
 use std::env;
 use std::fs;
 use std::process::ExitCode;
-use crc64fast::Digest;
+use crc64fast_nvme::Digest;
 
 const CRC_NVME: crc::Algorithm<u64> = crc::Algorithm {
     width: 64,

@@ -2,6 +2,11 @@
 
 use std::env::args;
 
+// CRC-64/NVME polynomial
+//
+// NVM Express® NVM Command Set Specification (Revision 1.0d, December 2023)
+//
+// https://nvmexpress.org/wp-content/uploads/NVM-Express-NVM-Command-Set-Specification-1.0d-2023.12.28-Ratified.pdf
 const POLY: u64 = 0xAD93D23594C93659;
 
 // usage:

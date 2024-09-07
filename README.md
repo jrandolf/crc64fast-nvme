@@ -15,7 +15,7 @@ Primarily changes the `CRC-64/XZ` (aka `CRC-64/GO-ECMA`) polynomial from [crc64f
 ## Usage
 
 ```rust
-use crc64fast::Digest;
+use crc64fast_nvme::Digest;
 
 let mut c = Digest::new();
 c.write(b"hello ");
