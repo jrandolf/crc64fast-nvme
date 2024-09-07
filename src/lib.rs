@@ -3,7 +3,7 @@
 //! `crc64fast`
 //! ===========
 //!
-//! SIMD-accelerated CRC-64-NVME (aka CRC-64-Rocksoft) computation
+//! SIMD-accelerated CRC-64/NVME computation
 //! (similar to [`crc32fast`](https://crates.io/crates/crc32fast)).
 //!
 //! ## Usage
@@ -55,7 +55,7 @@ impl Digest {
         self.state = (self.computer)(self.state, bytes);
     }
 
-    /// Computes the current CRC-64-NVME value.
+    /// Computes the current CRC-64/NVME value.
     pub fn sum64(&self) -> u64 {
         !self.state
     }
@@ -73,8 +73,13 @@ mod tests {
     use proptest::collection::size_range;
     use proptest::prelude::*;
 
-    // CRC-64/NVME (aka CRC-64/Rocksoft)
-    // https://github.com/torvalds/linux/blob/master/lib/crc64.c#L73
+    // CRC-64/NVME
+    //
+    // NVM Express® NVM Command Set Specification (Revision 1.0d, December 2023)
+    //
+    // https://nvmexpress.org/wp-content/uploads/NVM-Express-NVM-Command-Set-Specification-1.0d-2023.12.28-Ratified.pdf
+    //
+    // Note: The Check value published in the spec is incorrect (Section 5.2.1.3.4, Figure 120, page 83).
     const CRC_NVME: crc::Algorithm<u64> = crc::Algorithm {
         width: 64,
         poly: 0xAD93D23594C93659,
@@ -89,12 +94,16 @@ mod tests {
     #[test]
     fn test_standard_vectors() {
         static CASES: &[(&[u8], u64)] = &[
-            // from the Linux kernel
-            // https://github.com/torvalds/linux/blob/master/crypto/testmgr.h#L5358
+            // from the NVM Express® NVM Command Set Specification (Revision 1.0d, December 2023),
+            // Section 5.2.1.3.5, Figure 122, page 84.
+            // https://nvmexpress.org/wp-content/uploads/NVM-Express-NVM-Command-Set-Specification-1.0d-2023.12.28-Ratified.pdf
+            // and the Linux kernel
+            // https://github.com/torvalds/linux/blob/f3813f4b287e480b1fcd62ca798d8556644b8278/crypto/testmgr.h#L3685-L3695
             (&[0; 4096], 0x6482d367eb22b64e),
             (&[255; 4096], 0xc0ddba7302eca3ac),
 
-            // from our own internal tests
+            // from our own internal tests, since the Check value in the  NVM Express® NVM Command
+            // Set Specification (Revision 1.0d, December 2023) is incorrect (Section 5.2.1.3.4, Figure 120, page 83).
             (b"123456789", 0xae8b14860a799888),
 
             // updated values from the original CRC-64/XZ fork of this project

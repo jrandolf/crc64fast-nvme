@@ -1,4 +1,4 @@
-/// Generates CRC-64-NVME (aka `CRC-64-Rocksoft`) checksums, using SIMD-accelerated
+/// Generates CRC-64/NVME checksums, using SIMD-accelerated
 /// carryless-multiplication, from a file on disk.
 
 use std::env;

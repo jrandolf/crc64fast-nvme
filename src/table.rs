@@ -1,6 +1,6 @@
 // Copyright 2019 TiKV Project Authors. Licensed under MIT or Apache-2.0.
 
-//! Table-based CRC-64-NVME computer.
+//! Table-based CRC-64/NVME computer.
 //!
 //! The update function computes the CRC value 16 bytes at a time.
 //! The processing speed is roughly 5× of the one-byte-at-a-time method.
@@ -22,12 +22,12 @@ pub(crate) fn update(mut state: u64, bytes: &[u8]) -> u64 {
     state
 }
 
-/// Performs the CRC-64-NVME update, one byte at a time.
+/// Performs the CRC-64/NVME update, one byte at a time.
 fn update_1(state: u64, b: u8) -> u64 {
     (state >> 8) ^ TABLE_0[usize::from(b ^ (state as u8))]
 }
 
-/// Performs the CRC-64-NVME update, 16 bytes at a time.
+/// Performs the CRC-64/NVME update, 16 bytes at a time.
 fn update_16(state: u64, b: &[u8; 16]) -> u64 {
     let s = state.to_le_bytes();
     TABLE_0[usize::from(b[15])]
@@ -50,7 +50,7 @@ fn update_16(state: u64, b: &[u8; 16]) -> u64 {
 
 // Constants used in SIMD-based computations.
 // All K_nnn constants are computed by bit_reverse(x^nnn mod POLY).
-// Used the NVME polynomial (0xAD93D23594C93659)
+// Used the NVME polynomial (0xAD93D23594C93659) from the
 pub(crate) const K_127: u64 = 0x21e9_761e_2526_21ac;
 pub(crate) const K_191: u64 = 0xeadc_41fd_2ba3_d420;
 pub(crate) const K_255: u64 = 0xe1e0_bb9d_45d7_a44c;
