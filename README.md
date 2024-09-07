@@ -1,4 +1,4 @@
-crc64fast (CRC-64/NVME)
+crc64fast-nvme
 =========
 
 [![Build status](https://github.com/awesomized/crc64fast-nvme/workflows/Rust/badge.svg)](https://github.com/awesomized/crc64fast-nvme/actions?query=workflow%3ARust)
