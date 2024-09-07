@@ -2,6 +2,8 @@ crc64fast-nvme
 =========
 
 [![Build status](https://github.com/awesomized/crc64fast-nvme/workflows/Rust/badge.svg)](https://github.com/awesomized/crc64fast-nvme/actions?query=workflow%3ARust)
+[![Latest Version](https://img.shields.io/crates/v/crc64fast-nvme.svg)](https://crates.io/crates/crc64fast-nvme)
+[![Documentation](https://img.shields.io/badge/api-rustdoc-blue.svg)](https://docs.rs/crc64fast-nvme)
 
 SIMD-accelerated carryless-multiplication [CRC-64/NVME](https://reveng.sourceforge.io/crc-catalogue/all.htm#crc.cat.crc-64-nvme) checksum computation
 (similar to [crc32fast](https://crates.io/crates/crc32fast) and forked from [crc64fast](https://github.com/tikv/crc64fast) which calculates [CRC-64/XZ](https://reveng.sourceforge.io/crc-catalogue/all.htm#crc.cat.crc-64-xz) [a.k.a `CRC-64/GO-ECMA`]).
