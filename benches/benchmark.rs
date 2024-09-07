@@ -24,15 +24,19 @@ fn bench_crc(c: &mut Criterion) {
                 digest.finalize()
             })
         });
-        group.bench_with_input(BenchmarkId::new("crc64fast_nvme::simd", size), &buf, |b, buf| {
-            b.iter(|| {
-                let mut digest = crc64fast_nvme::Digest::new();
-                digest.write(&buf[..(1 << size)]);
-                digest.write(&buf[(1 << size)..(2 << size)]);
-                digest.write(&buf[(2 << size)..]);
-                digest.sum64()
-            })
-        });
+        group.bench_with_input(
+            BenchmarkId::new("crc64fast_nvme::simd", size),
+            &buf,
+            |b, buf| {
+                b.iter(|| {
+                    let mut digest = crc64fast_nvme::Digest::new();
+                    digest.write(&buf[..(1 << size)]);
+                    digest.write(&buf[(1 << size)..(2 << size)]);
+                    digest.write(&buf[(2 << size)..]);
+                    digest.sum64()
+                })
+            },
+        );
         group.bench_with_input(
             BenchmarkId::new("crc64fast_nvme::table", size),
             &buf,
