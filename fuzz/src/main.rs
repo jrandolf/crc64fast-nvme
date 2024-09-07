@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate afl;
-extern crate crc64fast;
+extern crate crc64fast-nvme;
 
 use crc64fast::Digest;
 

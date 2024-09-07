@@ -6,4 +6,4 @@ publish = false
 
 [dependencies]
 afl = "0.8.0"
-crc64fast = { path = ".." }
+crc64fast-nvme = { path = ".." }

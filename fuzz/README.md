@@ -1,6 +1,6 @@
 # Fuzz Testing
 
-This is the fuzz testing target for the `crc64fast` crate.
+This is the fuzz testing target for the `crc64fast-nvme` crate.
 
 1. Install `afl` via `cargo install afl`
 2. Build the fuzz target via `cargo afl build`
