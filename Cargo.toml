@@ -1,12 +1,13 @@
 [package]
-name = "crc64fast"
-version = "1.1.0"
-authors = ["The TiKV Project Developers"]
+name = "crc64fast-nvme"
+version = "1.0.0"
+authors = ["The TiKV Project Developers", "Don MacAskill"]
 license = "MIT OR Apache-2.0"
 edition = "2021"
-keywords = ["crc", "crc64", "simd", "checksum"]
-repository = "https://github.com/tikv/crc64fast"
-description = "SIMD accelerated CRC64 calculation"
+keywords = ["crc", "crc64", "simd", "checksum", "nvme"]
+categories = ["algorithms", "command-line-utilities", "encoding", "hardware-support"]
+repository = "https://github.com/awesomized/crc64fast-nvme"
+description = "SIMD accelerated CRC-64/NVME checksum calculation"
 readme = "README.md"
 
 # Note: Rust 1.70 upgraded LLVM version to 16 (in particular https://reviews.llvm.org/D131047)
