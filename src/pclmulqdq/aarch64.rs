@@ -3,7 +3,6 @@
 //! AArch64 implementation of the PCLMULQDQ-based CRC calculation.
 
 use std::arch::{aarch64::*, is_aarch64_feature_detected};
-use std::mem::transmute;
 use std::ops::BitXor;
 
 #[repr(transparent)]
@@ -68,18 +67,18 @@ impl super::SimdExt for Simd {
     #[target_feature(enable = "neon")]
     unsafe fn fold_8(self, coeff: u64) -> Self {
         let [x0, x1] = self.into_poly64s();
-        let h = Self::from_mul(transmute(coeff), x0);
-        let l = Self::new(0, transmute(x1));
+        let h = Self::from_mul(coeff, x0);
+        let l = Self::new(0, x1);
         h ^ l
     }
 
     #[inline]
     #[target_feature(enable = "neon")]
     unsafe fn barrett(self, poly: u64, mu: u64) -> u64 {
-        let t1 = Self::from_mul(self.low_64(), transmute(mu)).low_64();
-        let l = Self::from_mul(t1, transmute(poly));
-        let reduced: u64 = transmute((self ^ l).high_64());
-        let t1: u64 = transmute(t1);
+        let t1 = Self::from_mul(self.low_64(), mu).low_64();
+        let l = Self::from_mul(t1, poly);
+        let reduced: u64 = (self ^ l).high_64();
+        let t1: u64 = t1;
         reduced ^ t1
     }
 }

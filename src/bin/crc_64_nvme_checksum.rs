@@ -22,7 +22,7 @@ fn calculate_crc_64_simd_from_file(file: &str) -> u64 {
 
     c.write(std::fs::read(file).unwrap().as_slice());
 
-    return c.sum64();
+    c.sum64()
 }
 
 fn calculate_crc_64_validate_from_file(file: &str) -> u64 {
@@ -32,7 +32,7 @@ fn calculate_crc_64_validate_from_file(file: &str) -> u64 {
 
     digest.update(std::fs::read(file).unwrap().as_slice());
 
-    return digest.finalize();
+    digest.finalize()
 }
 
 fn calculate_crc_64_simd_from_string(input: &str) -> u64 {
@@ -40,7 +40,7 @@ fn calculate_crc_64_simd_from_string(input: &str) -> u64 {
 
     c.write(input.as_bytes());
 
-    return c.sum64();
+    c.sum64()
 }
 
 fn calculate_crc_64_validate_from_string(input: &str) -> u64 {
@@ -50,7 +50,7 @@ fn calculate_crc_64_validate_from_string(input: &str) -> u64 {
 
     digest.update(input.as_bytes());
 
-    return digest.finalize();
+    digest.finalize()
 }
 
 fn main() -> ExitCode {
@@ -70,7 +70,7 @@ fn main() -> ExitCode {
     if "--file" == input_type {
         let file = &args[2];
 
-        if false == fs::metadata(file).is_ok() {
+        if fs::metadata(file).is_err() {
             println!("Couldn't open file {}", file);
 
             return ExitCode::from(1);
@@ -107,5 +107,5 @@ fn main() -> ExitCode {
 
     println!("An error occurred, likely due to bad command-line arguments.");
 
-    return ExitCode::from(1);
+    ExitCode::from(1)
 }

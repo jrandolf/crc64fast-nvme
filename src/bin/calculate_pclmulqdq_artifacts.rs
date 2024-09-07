@@ -251,10 +251,10 @@ fn main() {
     }
 
     let polynomial = u64::from_str_radix(
-        &args[1].trim_start_matches("0x"), 16
+        args[1].trim_start_matches("0x"), 16
     ).expect("Failed to parse polynomial");
 
-    for (_, &size) in KEY_SIZES.iter().enumerate() {
+    for &size in KEY_SIZES.iter() {
         println!("k_{} = 0x{:x}", size, generate_key(size as u64, polynomial));
     }
 
