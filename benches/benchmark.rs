@@ -24,9 +24,9 @@ fn bench_crc(c: &mut Criterion) {
                 digest.finalize()
             })
         });
-        group.bench_with_input(BenchmarkId::new("crc64fast::simd", size), &buf, |b, buf| {
+        group.bench_with_input(BenchmarkId::new("crc64fast_nvme::simd", size), &buf, |b, buf| {
             b.iter(|| {
-                let mut digest = crc64fast::Digest::new();
+                let mut digest = crc64fast_nvme::Digest::new();
                 digest.write(&buf[..(1 << size)]);
                 digest.write(&buf[(1 << size)..(2 << size)]);
                 digest.write(&buf[(2 << size)..]);
@@ -34,11 +34,11 @@ fn bench_crc(c: &mut Criterion) {
             })
         });
         group.bench_with_input(
-            BenchmarkId::new("crc64fast::table", size),
+            BenchmarkId::new("crc64fast_nvme::table", size),
             &buf,
             |b, buf| {
                 b.iter(|| {
-                    let mut digest = crc64fast::Digest::new_table();
+                    let mut digest = crc64fast_nvme::Digest::new_table();
                     digest.write(&buf[..(1 << size)]);
                     digest.write(&buf[(1 << size)..(2 << size)]);
                     digest.write(&buf[(2 << size)..]);
