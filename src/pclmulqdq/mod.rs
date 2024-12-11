@@ -8,8 +8,9 @@
 //! [white paper]: https://web.archive.org/web/20131224125630/https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf
 
 #[cfg(not(feature = "fake-simd"))]
-#[cfg_attr(any(target_arch = "x86", target_arch = "x86_64"), path = "x86.rs")]
+#[cfg_attr(target_arch = "x86_64", path = "x86_64.rs")]
 #[cfg_attr(target_arch = "aarch64", path = "aarch64.rs")]
+#[cfg_attr(target_arch = "x86", path = "x86.rs")]
 mod arch;
 
 #[cfg(feature = "fake-simd")]

@@ -1,9 +1,9 @@
 // Copyright 2020 TiKV Project Authors. Licensed under MIT or Apache-2.0.
 
-//! x86 (32-bit) implementation of the PCLMULQDQ-based CRC calculation.
+//! x86_64 implementation of the PCLMULQDQ-based CRC calculation.
 
-#[cfg(target_arch = "x86")]
-use std::arch::x86::*;
+#[cfg(target_arch = "x86_64")]
+use std::arch::x86_64::*;
 use std::ops::BitXor;
 
 #[repr(transparent)]
@@ -14,20 +14,13 @@ impl super::SimdExt for Simd {
     fn is_supported() -> bool {
         is_x86_feature_detected!("pclmulqdq") // _mm_clmulepi64_si128
             && is_x86_feature_detected!("sse2") // (all other _mm_*)
-            && is_x86_feature_detected!("sse4.1")
+            && is_x86_feature_detected!("sse4.1") // _mm_extract_epi64
     }
 
     #[inline]
     #[target_feature(enable = "sse2")]
     unsafe fn new(high: u64, low: u64) -> Self {
-        // On 32-bit systems, we need to split u64 into low and high 32-bit parts
-        let high_low = (high & 0xFFFFFFFF) as i32;
-        let high_high = ((high >> 32) & 0xFFFFFFFF) as i32;
-        let low_low = (low & 0xFFFFFFFF) as i32;
-        let low_high = ((low >> 32) & 0xFFFFFFFF) as i32;
-
-        // Create the 128-bit vector using 32-bit parts
-        Self(_mm_set_epi32(high_high, high_low, low_high, low_low))
+        Self(_mm_set_epi64x(high as i64, low as i64))
     }
 
     #[inline]
@@ -55,15 +48,7 @@ impl super::SimdExt for Simd {
         let h = Self(_mm_slli_si128(t1, 8));
         let l = Self(_mm_clmulepi64_si128(t1, polymu.0, 0x10));
         let reduced = h ^ l ^ self;
-
-        // Store the result in memory and read it back as u64
-        // This approach is more reliable for handling 64-bit values on 32-bit systems
-        let mut result: [u32; 4] = [0; 4];
-        _mm_storeu_si128(result.as_mut_ptr() as *mut __m128i, reduced.0);
-
-        // Combine the two 32-bit values into a 64-bit result
-        // We want the high 64 bits (indices 2 and 3)
-        ((result[3] as u64) << 32) | (result[2] as u64)
+        _mm_extract_epi64(reduced.0, 1) as u64
     }
 }
 
