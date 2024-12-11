@@ -27,12 +27,7 @@ impl super::SimdExt for Simd {
         let low_high = ((low >> 32) & 0xFFFFFFFF) as i32;
 
         // Create the 128-bit vector using 32-bit parts
-        Self(_mm_set_epi32(
-            high_high,
-            high_low,
-            low_high,
-            low_low,
-        ))
+        Self(_mm_set_epi32(high_high, high_low, low_high, low_low))
     }
 
     #[inline]
