@@ -17,6 +17,12 @@
 //! let checksum = c.sum64();
 //! assert_eq!(checksum, 0xd9160d1fa8e418e3);
 //! ```
+//!
+//! Tracking links for unstable features used here (which require nightly builds):
+//!
+//! - simd_ffi: https://github.com/rust-lang/rust/issues/27731
+//! - link_llvm_intrinsics: https://github.com/rust-lang/rust/issues/29602
+//! - avx512_target_feature: https://github.com/rust-lang/rust/issues/111137
 
 #![cfg_attr(
     feature = "vpclmulqdq",
