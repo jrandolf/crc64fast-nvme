@@ -2,8 +2,8 @@
 
 //! x86 (32-bit) implementation of the PCLMULQDQ-based CRC calculation.
 
-#[cfg(target_arch = "x86")]
-use std::arch::x86::*;
+#[cfg(target_arch = "x86_64")]
+use std::arch::x86_64::*;
 use std::ops::BitXor;
 
 #[cfg(all(feature = "vpclmulqdq"))]
@@ -59,15 +59,6 @@ impl super::SimdExt for Simd {
         let l = Self(_mm_clmulepi64_si128::<0x10>(t1, polymu.0));
         let reduced = h ^ l ^ self;
         _mm_extract_epi64::<1>(reduced.0) as u64
-
-        // Store the result in memory and read it back as u64
-        // This approach is more reliable for handling 64-bit values on 32-bit systems
-        let mut result: [u32; 4] = [0; 4];
-        _mm_storeu_si128(result.as_mut_ptr() as *mut __m128i, reduced.0);
-
-        // Combine the two 32-bit values into a 64-bit result
-        // We want the high 64 bits (indices 2 and 3)
-        ((result[3] as u64) << 32) | (result[2] as u64)
     }
 }
 
