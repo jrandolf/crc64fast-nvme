@@ -43,7 +43,7 @@ impl Simd256 {
     }
 
     #[inline]
-    #[target_feature(enable = "avx2", enable = "avx512vpclmulqdq")]
+    #[target_feature(enable = "avx2", enable = "vpclmulqdq")]
     pub unsafe fn fold_32(self, coeff: Self) -> Self {
         let h = pclmulqdq_256(self.0, coeff.0, 0x11);
         let l = pclmulqdq_256(self.0, coeff.0, 0x00);
@@ -61,7 +61,7 @@ impl BitXor for Simd256 {
 }
 
 #[inline]
-#[target_feature(enable = "avx2", enable = "avx512vpclmulqdq")]
+#[target_feature(enable = "avx2", enable = "vpclmulqdq")]
 pub(crate) unsafe fn update_vpclmulqdq(
     state: u64,
     first: &[[Simd256; 4]; 2],
@@ -193,7 +193,7 @@ fn test_xor() {
     }
 }
 
-#[cfg(all(target_feature = "avx2", target_feature = "avx512vpclmulqdq"))]
+#[cfg(all(target_feature = "avx2", target_feature = "vpclmulqdq"))]
 #[test]
 fn test_fold_32() {
     unsafe {

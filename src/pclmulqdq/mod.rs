@@ -100,7 +100,7 @@ unsafe fn update_128_batch(mut state: u64, bytes: &[u8]) -> u64 {
 }
 
 #[cfg(feature = "vpclmulqdq")]
-#[target_feature(enable = "avx2", enable = "avx512vpclmulqdq")]
+#[target_feature(enable = "avx2", enable = "vpclmulqdq")]
 unsafe fn update_256_batch(mut state: u64, bytes: &[u8]) -> u64 {
     use arch::vpclmulqdq::*;
     let (left, middle, right) = bytes.align_to::<[[Simd256; 4]; 2]>();
