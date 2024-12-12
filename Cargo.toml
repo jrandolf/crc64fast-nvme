@@ -25,6 +25,7 @@ rand = "0.8"
 
 [features]
 pmull = [] # deprecated, no longer have any effect.
+vpclmulqdq = []
 fake-simd = []
 
 [[bench]]
