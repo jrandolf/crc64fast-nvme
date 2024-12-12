@@ -17,8 +17,9 @@ use super::table;
 use self::arch::Simd;
 
 #[cfg(not(feature = "fake-simd"))]
-#[cfg_attr(any(target_arch = "x86", target_arch = "x86_64"), path = "x86/mod.rs")]
+#[cfg_attr(target_arch = "x86_64", path = "x86_64.rs")]
 #[cfg_attr(target_arch = "aarch64", path = "aarch64.rs")]
+#[cfg_attr(target_arch = "x86", path = "x86.rs")]
 mod arch;
 
 #[cfg(feature = "fake-simd")]
