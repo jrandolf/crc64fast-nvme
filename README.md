@@ -50,15 +50,18 @@ be chosen based on CPU feature at runtime.
 
 [crc 3.0.1]: https://docs.rs/crc/3.0.1/crc/index.html
 
-## TODO
+## Experimental VPCLMULQDQ support
 
-This crate is mainly intended for use in TiKV only.
-Features beyond AArch64 are unlikely to be implemented.
+Using Rust's support for [AVX512 intrinsics](https://github.com/rust-lang/rust/issues/111137), specifically [VPCLMULQDQ](https://doc.rust-lang.org/src/core/stdarch/crates/core_arch/src/x86/vpclmulqdq.rs.html), we can massively improve throughput for x86_64 processors which support them (Intel Ice Lake+ and AMD Zen4+).
 
-* [x] AArch64 support based on PMULL
-* [ ] `no_std` support
-* [x] Fuzz test
-* [ ] Custom polynomial
+Specifically, on an `m7i.8xlarge` EC2 instance (4th gen Xeon, aka Sapphire Rapids), throughput approximately _doubles_ from ~26GiB/s to ~52GiB/s.
+
+Since these are currently marked as unstable features in Rust, you'll need to build with `nightly` and enable the `vpclmulqdq` feature:
+
+``` 
+rustup toolchain install nightly
+cargo +nightly build --features="vpclmulqdq" -r
+```
 
 ## License
 
