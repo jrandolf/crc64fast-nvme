@@ -48,11 +48,12 @@ be chosen based on CPU feature at runtime.
 |:----------------------------|--------------------:|---------------------:|
 | [crc 3.0.1]                 |           0.5 GiB/s |            0.3 GiB/s |
 | crc64fast-nvme (table)      |           2.3 GiB/s |            1.8 GiB/s |
-| crc64fast-nvme (simd)       |          28.2 GiB/s |           20.0 GiB/s |
+| crc64fast-nvme (SIMD)       |          28.2 GiB/s |           20.0 GiB/s |
+| crc64fast-nvme (VPCLMULQDQ) |            52 GiB/s |                 n/a  |
 
 [crc 3.0.1]: https://docs.rs/crc/3.0.1/crc/index.html
 
-## Experimental VPCLMULQDQ support
+## Experimental "Vector Carry-Less Multiplication of Quadwords" (VPCLMULQDQ) support
 
 Using Rust's support for [AVX512 intrinsics](https://github.com/rust-lang/rust/issues/111137), specifically [VPCLMULQDQ](https://doc.rust-lang.org/src/core/stdarch/crates/core_arch/src/x86/vpclmulqdq.rs.html), we can massively improve throughput for x86_64 processors which support them (Intel Ice Lake+ and AMD Zen4+).
 
@@ -79,6 +80,7 @@ cargo +nightly build --features="vpclmulqdq" -r
 * [StackOverflow PCLMULQDQ CRC32 question](https://stackoverflow.com/questions/21171733/calculating-constants-for-crc32-using-pclmulqdq) - Insightful question & answer to CRC32 implementation details.
 * [AWS S3 announcement about CRC64-NVME support](https://aws.amazon.com/blogs/aws/introducing-default-data-integrity-protections-for-new-objects-in-amazon-s3/)
 * [AWS S3 docs on checking object integrity using CRC64-NVME](https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html)
+* [Vector Carry-Less Multiplication of Quadwords (VPCLMULQDQ) details](https://en.wikichip.org/wiki/x86/vpclmulqdq)
 
 ## License
 
