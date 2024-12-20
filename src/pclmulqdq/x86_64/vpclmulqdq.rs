@@ -1,18 +1,12 @@
 use super::{super::fold_tail, Simd, __cpuid_count, __m256i, _mm256_set_epi64x, _mm256_xor_si256};
 use core::ops::BitXor;
 use lazy_static::lazy_static;
-
-// PCLMULQDQ can be used without avx512vl. However, this is only addressed by rust recently --- so we
-// need to manually specify the intrinsic, otherwise rustc will inline it poorly.
-#[allow(improper_ctypes)]
-extern "C" {
-    #[link_name = "llvm.x86.pclmulqdq.256"]
-    fn pclmulqdq_256(a: __m256i, round_key: __m256i, imm8: u8) -> __m256i;
-}
+use std::arch::x86_64::_mm256_clmulepi64_epi128;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Simd256(__m256i);
 
+// this lazy_static bit takes throughput from ~39GiB/s to ~52GiB/s
 lazy_static! {
     static ref VPCLMULQDQ_SUPPORTED : bool = {
         let avx2 = is_x86_feature_detected!("avx2");
@@ -45,8 +39,8 @@ impl Simd256 {
     #[inline]
     #[target_feature(enable = "avx2", enable = "vpclmulqdq")]
     pub unsafe fn fold_32(self, coeff: Self) -> Self {
-        let h = pclmulqdq_256(self.0, coeff.0, 0x11);
-        let l = pclmulqdq_256(self.0, coeff.0, 0x00);
+        let h = _mm256_clmulepi64_epi128(self.0, coeff.0, 0x11);
+        let l = _mm256_clmulepi64_epi128(self.0, coeff.0, 0x00);
         Self(h) ^ Self(l)
     }
 }

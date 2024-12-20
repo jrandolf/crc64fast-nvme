@@ -26,7 +26,7 @@
 
 #![cfg_attr(
     feature = "vpclmulqdq",
-    feature(simd_ffi, link_llvm_intrinsics, avx512_target_feature,)
+    feature(avx512_target_feature, stdarch_x86_avx512)
 )]
 
 mod pclmulqdq;
