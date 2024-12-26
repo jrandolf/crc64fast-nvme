@@ -73,7 +73,7 @@ impl BitXorAssign for Simd {
 }
 
 pub fn get_update() -> super::UpdateFn {
-    #[cfg(all(feature = "vpclmulqdq"))]
+    #[cfg(feature = "vpclmulqdq")]
     {
         use arch::vpclmulqdq::*;
         if Simd256::is_supported() {

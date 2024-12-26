@@ -6,7 +6,7 @@
 use std::arch::x86_64::*;
 use std::ops::BitXor;
 
-#[cfg(all(feature = "vpclmulqdq"))]
+#[cfg(feature = "vpclmulqdq")]
 pub mod vpclmulqdq;
 
 #[repr(transparent)]
