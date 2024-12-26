@@ -18,6 +18,9 @@
 //! assert_eq!(checksum, 0xd9160d1fa8e418e3);
 //! ```
 
+use std::os::raw::c_char;
+use std::slice;
+
 mod pclmulqdq;
 mod table;
 
@@ -29,6 +32,59 @@ pub struct Digest {
     computer: UpdateFn,
     state: u64,
 }
+
+/// Begin functionality for building a C-compatible library
+///
+/// Opaque type for C for use in FFI
+#[repr(C)]
+pub struct DigestHandle(*mut Digest);
+
+#[no_mangle]
+pub extern "C" fn digest_new() -> *mut DigestHandle {
+    let digest = Box::new(Digest::new());
+    let handle = Box::new(DigestHandle(Box::into_raw(digest)));
+    Box::into_raw(handle)
+}
+
+/// # Safety
+///
+/// Uses unsafe method calls
+#[no_mangle]
+pub unsafe extern "C" fn digest_write(handle: *mut DigestHandle, data: *const c_char, len: usize) {
+    if handle.is_null() || data.is_null() {
+        return;
+    }
+
+    let digest = &mut *(*handle).0;
+    let bytes = slice::from_raw_parts(data as *const u8, len);
+    digest.write(bytes);
+}
+
+/// # Safety
+///
+/// Uses unsafe method calls
+#[no_mangle]
+pub unsafe extern "C" fn digest_sum64(handle: *const DigestHandle) -> u64 {
+    if handle.is_null() {
+        return 0;
+    }
+
+    let digest = &*(*handle).0;
+    digest.sum64()
+}
+
+/// # Safety
+///
+/// Uses unsafe method calls
+#[no_mangle]
+pub unsafe extern "C" fn digest_free(handle: *mut DigestHandle) {
+    if !handle.is_null() {
+        let handle = Box::from_raw(handle);
+        let _ = Box::from_raw(handle.0);
+    }
+}
+
+// end C-compatible library
 
 impl Digest {
     /// Creates a new `Digest`.
@@ -69,9 +125,10 @@ impl Default for Digest {
 
 #[cfg(test)]
 mod tests {
-    use super::Digest;
+    use super::*;
     use proptest::collection::size_range;
     use proptest::prelude::*;
+    use std::ptr;
 
     // CRC-64/NVME
     //
@@ -175,6 +232,133 @@ mod tests {
             hasher_1.write(&right);
             hasher_2.write(&right);
             prop_assert_eq!(hasher_1.sum64(), hasher_2.sum64());
+        }
+    }
+
+    // test the FFI Digest functions
+    #[test]
+    fn test_ffi_digest_lifecycle() {
+        unsafe {
+            // Create new digest
+            let handle = digest_new();
+            assert!(!handle.is_null(), "Digest creation failed");
+
+            // Write some data
+            let data = b"hello world!";
+            digest_write(handle, data.as_ptr() as *const c_char, data.len());
+
+            // Get sum and verify against known value
+            let sum = digest_sum64(handle);
+            assert_eq!(sum, 0xd9160d1fa8e418e3, "CRC64 calculation incorrect");
+
+            // Clean up
+            digest_free(handle);
+        }
+    }
+
+    #[test]
+    fn test_ffi_null_handling() {
+        unsafe {
+            // Test null handle with write
+            digest_write(ptr::null_mut(), b"test".as_ptr() as *const c_char, 4);
+
+            // Test null data with valid handle
+            let handle = digest_new();
+            digest_write(handle, ptr::null(), 0);
+
+            // Test null handle with sum64
+            let sum = digest_sum64(ptr::null());
+            assert_eq!(sum, 0, "Null handle should return 0");
+
+            // Clean up
+            digest_free(handle);
+        }
+    }
+
+    #[test]
+    fn test_ffi_empty_data() {
+        unsafe {
+            let handle = digest_new();
+
+            // Write empty data
+            digest_write(handle, b"".as_ptr() as *const c_char, 0);
+            let sum = digest_sum64(handle);
+            assert_eq!(sum, 0, "Empty data should produce 0");
+
+            digest_free(handle);
+        }
+    }
+
+    #[test]
+    fn test_ffi_binary_data() {
+        unsafe {
+            let handle = digest_new();
+
+            // Test with binary data including null bytes
+            let data = [0u8, 1, 2, 3, 0, 4, 5, 0, 6];
+            digest_write(handle, data.as_ptr() as *const c_char, data.len());
+
+            // Write additional data to test streaming
+            let more_data = [7u8, 8, 9];
+            digest_write(handle, more_data.as_ptr() as *const c_char, more_data.len());
+
+            let sum = digest_sum64(handle);
+            assert_ne!(sum, 0, "Binary data should produce non-zero CRC");
+
+            digest_free(handle);
+        }
+    }
+
+    #[test]
+    fn test_ffi_large_vectors() {
+        unsafe {
+            let zeros = vec![0u8; 4096];
+            let ones = vec![255u8; 4096];
+
+            let handle = digest_new();
+            digest_write(handle, zeros.as_ptr() as *const c_char, zeros.len());
+            let sum = digest_sum64(handle);
+            assert_eq!(sum, 0x6482d367eb22b64e, "Failed on 4096 zeros");
+            digest_free(handle);
+
+            let handle = digest_new();
+            digest_write(handle, ones.as_ptr() as *const c_char, ones.len());
+            let sum = digest_sum64(handle);
+            assert_eq!(sum, 0xc0ddba7302eca3ac, "Failed on 4096 ones");
+            digest_free(handle);
+        }
+    }
+
+    #[test]
+    fn test_ffi_standard_strings() {
+        unsafe {
+            let test_cases: Vec<(&[u8], u64)> = vec![(b"123456789", 0xae8b14860a799888), (b"", 0)];
+
+            for (input, expected) in test_cases {
+                let handle = digest_new();
+                digest_write(handle, input.as_ptr() as *const c_char, input.len());
+                let sum = digest_sum64(handle);
+                assert_eq!(sum, expected, "Failed on test vector: {:?}", input);
+                digest_free(handle);
+            }
+        }
+    }
+
+    #[test]
+    fn test_ffi_incremental_update() {
+        unsafe {
+            let handle = digest_new();
+
+            // Write data incrementally
+            let data = "hello world!";
+            for byte in data.bytes() {
+                digest_write(handle, &byte as *const u8 as *const c_char, 1);
+            }
+
+            let sum = digest_sum64(handle);
+            assert_eq!(sum, 0xd9160d1fa8e418e3, "Incremental update failed");
+
+            digest_free(handle);
         }
     }
 }
