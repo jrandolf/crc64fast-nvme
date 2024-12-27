@@ -22,6 +22,8 @@ Primarily changes the `CRC-64/XZ` (aka `CRC-64/GO-ECMA`) polynomial from [crc64f
 
 ## Usage
 
+### Rust
+
 ```rust
 use crc64fast_nvme::Digest;
 
@@ -31,6 +33,11 @@ c.write(b"world!");
 let checksum = c.sum64();
 assert_eq!(checksum, 0xd9160d1fa8e418e3);
 ```
+
+### C-compatible shared library
+`cargo build` will produce a shared library target (`.so` on Linux, `.dll` on Windows, `.dylib` on macOS, etc) and `crc64vnme.h` header file for use in non-Rust projects, such as through FFI.
+
+There is a [crc-fast-php](https://github.com/awesomized/crc-fast-php) library using it with PHP, for example.
 
 ## CLI example
 A simple CLI implementation can be found in [crc_64_nvme_checksum.rs](src\bin\crc_64_nvme_checksum.rs), which will calculate the `CRC-64/NVME` checksum for a file on disk.
