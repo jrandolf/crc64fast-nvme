@@ -12,6 +12,10 @@ SIMD-accelerated carryless-multiplication [CRC-64/NVME](https://reveng.sourcefor
 
 SIMD-accelerated carryless-multiplication is based on the Intel [Fast CRC Computation for Generic Polynomials Using PCLMULQDQ Instruction](https://web.archive.org/web/20131224125630/https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf) paper.
 
+## Changes
+
+See [CHANGELOG](CHANGELOG.md).
+
 ## Changes from [crc64fast](https://github.com/tikv/crc64fast)
 
 Primarily changes the `CRC-64/XZ` (aka `CRC-64/GO-ECMA`) polynomial from [crc64fast](https://github.com/tikv/crc64fast) (which uses the `ECMA-182` polynomial [`0x42F0E1EBA9EA3693`]) to use the `NVME` polynomial (`0xAD93D23594C93659`), plus re-calculates the input parameters (tables, keys, mu, and reciprocal polynomial) for fast operations.
