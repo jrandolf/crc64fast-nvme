@@ -17,11 +17,22 @@
 //! let checksum = c.sum64();
 //! assert_eq!(checksum, 0xd9160d1fa8e418e3);
 //! ```
+//!
+//! Tracking links for unstable features used here (which require nightly builds):
+//!
+//! - simd_ffi: https://github.com/rust-lang/rust/issues/27731
+//! - link_llvm_intrinsics: https://github.com/rust-lang/rust/issues/29602
+//! - avx512_target_feature: https://github.com/rust-lang/rust/issues/111137
+
+#![cfg_attr(
+    feature = "vpclmulqdq",
+    feature(avx512_target_feature, stdarch_x86_avx512)
+)]
 
 mod pclmulqdq;
 mod table;
 
-type UpdateFn = fn(u64, &[u8]) -> u64;
+type UpdateFn = unsafe fn(u64, &[u8]) -> u64;
 
 /// Represents an in-progress CRC-64 computation.
 #[derive(Clone)]
@@ -52,7 +63,9 @@ impl Digest {
 
     /// Writes some data into the digest.
     pub fn write(&mut self, bytes: &[u8]) {
-        self.state = (self.computer)(self.state, bytes);
+        unsafe {
+            self.state = (self.computer)(self.state, bytes);
+        }
     }
 
     /// Computes the current CRC-64/NVME value.
