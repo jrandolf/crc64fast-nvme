@@ -39,6 +39,14 @@ assert_eq!(checksum, 0xd9160d1fa8e418e3);
 
 There is a [crc-fast-php](https://github.com/awesomized/crc-fast-php) library using it with PHP, for example.
 
+```php
+/** \FFI $ffi */
+
+$digest = $ffi->digest_new();
+$ffi->digest_write($digest, 'hello world!', 12);
+$checksum = $ffi->digest_sum64($digest); // 0xd9160d1fa8e418e3
+```
+
 ## CLI example
 A simple CLI implementation can be found in [crc_64_nvme_checksum.rs](src\bin\crc_64_nvme_checksum.rs), which will calculate the `CRC-64/NVME` checksum for a file on disk.
 

@@ -8,7 +8,9 @@
 //!
 //! ## Usage
 //!
-//! ```
+//! ### Rust
+//!
+//! ```rust
 //! use crc64fast_nvme::Digest;
 //!
 //! let mut c = Digest::new();
@@ -17,12 +19,21 @@
 //! let checksum = c.sum64();
 //! assert_eq!(checksum, 0xd9160d1fa8e418e3);
 //! ```
+//! ### C-compatible shared library example (PHP)
 //!
-//! Tracking links for unstable features used here (which require nightly builds):
+//! ```php
+//! $digest = $ffi->digest_new();
+//! $ffi->digest_write($digest, 'hello world!', 12);
+//! $checksum = $ffi->digest_sum64($digest); // 0xd9160d1fa8e418e3
+//! ```
 //!
-//! - simd_ffi: https://github.com/rust-lang/rust/issues/27731
-//! - link_llvm_intrinsics: https://github.com/rust-lang/rust/issues/29602
-//! - avx512_target_feature: https://github.com/rust-lang/rust/issues/111137
+//! Tracking links for unstable features used here with the
+//! [experimental VPCLMULQDQ](https://github.com/awesomized/crc64fast-nvme?tab=readme-ov-file#experimental-vector-carry-less-multiplication-of-quadwords-vpclmulqdq-support)
+//! features (which require nightly builds):
+//!
+//! - [simd_ffi](https://github.com/rust-lang/rust/issues/27731)
+//! - [link_llvm_intrinsics](https://github.com/rust-lang/rust/issues/29602)
+//! - [avx512_target_feature](https://github.com/rust-lang/rust/issues/111137)
 
 #![cfg_attr(
     feature = "vpclmulqdq",
@@ -44,12 +55,13 @@ pub struct Digest {
     state: u64,
 }
 
-/// Begin functionality for building a C-compatible library
-///
-/// Opaque type for C for use in FFI
+// begin C-compatible shared library methods
+
+/// Opaque type for C for use in FFI (C-compatible shared library)
 #[repr(C)]
 pub struct DigestHandle(*mut Digest);
 
+/// Creates a new Digest (C-compatible shared library)
 #[no_mangle]
 pub extern "C" fn digest_new() -> *mut DigestHandle {
     let digest = Box::new(Digest::new());
@@ -57,6 +69,8 @@ pub extern "C" fn digest_new() -> *mut DigestHandle {
     Box::into_raw(handle)
 }
 
+/// Writes data to the Digest (C-compatible shared library)
+///
 /// # Safety
 ///
 /// Uses unsafe method calls
@@ -71,6 +85,8 @@ pub unsafe extern "C" fn digest_write(handle: *mut DigestHandle, data: *const c_
     digest.write(bytes);
 }
 
+/// Calculates the CRC-64 checksum from the Digest (C-compatible shared library)
+///
 /// # Safety
 ///
 /// Uses unsafe method calls
@@ -84,6 +100,8 @@ pub unsafe extern "C" fn digest_sum64(handle: *const DigestHandle) -> u64 {
     digest.sum64()
 }
 
+/// Frees the Digest (C-compatible shared library)
+///
 /// # Safety
 ///
 /// Uses unsafe method calls
@@ -95,7 +113,7 @@ pub unsafe extern "C" fn digest_free(handle: *mut DigestHandle) {
     }
 }
 
-// end C-compatible library
+// end C-compatible shared library methods
 
 impl Digest {
     /// Creates a new `Digest`.
