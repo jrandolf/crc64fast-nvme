@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## [1.1.1](https://github.com/awesomized/crc64fast-nvme/compare/1.0.1...1.1.0)
+- [Improve documentation](https://github.com/awesomized/crc64fast-nvme/commit/8339187650c621c6491c05105da4799897c21043)
+
 ## [1.1.0](https://github.com/awesomized/crc64fast-nvme/compare/1.0.1...1.1.0)
 - [Build a C-compatible shared library](https://github.com/awesomized/crc64fast-nvme/pull/4)
 - [Double throughput on systems which support AVX512 VPCLMULQDQ](https://github.com/awesomized/crc64fast-nvme/pull/3)
