@@ -7,5 +7,5 @@ fn main() {
 
     cbindgen::generate(crate_dir)
         .expect("Unable to generate C bindings.")
-        .write_to_file("crc64nvme.h");
+        .write_to_file("crc64fast_nvme.h");
 }

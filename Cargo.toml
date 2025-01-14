@@ -40,4 +40,5 @@ strip = true
 cbindgen = "0.27.0"
 
 [lib]
+name = "crc64fast_nvme"
 crate-type = ["lib", "cdylib"]
